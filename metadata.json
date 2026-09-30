@@ -1,0 +1,6 @@
+{
+  "name": "CSE Batch Fund Manager",
+  "description": "CSE Batch 25-26 স্টুডেন্ট ব্যাচ ফান্ড ও হিসাব ম্যানেজমেন্ট সিস্টেম (ইসলামী বিশ্ববিদ্যালয়, কুষ্টিয়া)",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
