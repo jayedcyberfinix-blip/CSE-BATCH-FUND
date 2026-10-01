@@ -18,6 +18,7 @@ import {
   calculateSummary 
 } from './lib/constants';
 import { BatchInfo, Student, Contribution, Expense } from './types';
+import { getDefaultEmblemDataUrl } from './lib/imageUtils';
 import { 
   Layers, 
   LayoutDashboard, 
@@ -41,7 +42,21 @@ export default function App() {
 
   const [batchInfo, setBatchInfo] = useState<BatchInfo>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.BATCH_INFO);
-    return saved ? JSON.parse(saved) : INITIAL_BATCH_INFO;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (!parsed.customLogo) {
+          parsed.customLogo = getDefaultEmblemDataUrl();
+        }
+        return parsed;
+      } catch {
+        // fallback
+      }
+    }
+    return {
+      ...INITIAL_BATCH_INFO,
+      customLogo: getDefaultEmblemDataUrl()
+    };
   });
 
   const [students, setStudents] = useState<Student[]>(() => {
@@ -291,6 +306,7 @@ export default function App() {
                 contributions={contributions} 
                 expenses={expenses} 
                 batchInfo={batchInfo}
+                onUpdateBatchInfo={setBatchInfo}
                 onOpenResetAllModal={() => setIsResetModalOpen(true)}
               />
             </div>

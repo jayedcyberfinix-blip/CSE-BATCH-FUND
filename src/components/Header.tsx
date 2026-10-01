@@ -15,6 +15,7 @@ import {
   BookOpen
 } from 'lucide-react';
 import { toBengaliDigits, MONTHS } from '../lib/constants';
+import { processImageFile } from '../lib/imageUtils';
 
 interface HeaderProps {
   batchInfo: BatchInfo;
@@ -45,17 +46,16 @@ export function Logo({
     lg: 'w-20 h-20'
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && onLogoChange) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
-          onLogoChange(reader.result);
-          setImgError(false);
-        }
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressedBase64 = await processImageFile(file);
+        onLogoChange(compressedBase64);
+        setImgError(false);
+      } catch (err) {
+        console.error('Failed to process image:', err);
+      }
     }
   };
 
@@ -64,12 +64,12 @@ export function Logo({
       <div 
         onClick={() => editable && fileInputRef.current?.click()}
         className={`relative ${sizeClasses[size]} rounded-full overflow-hidden bg-white p-1 shadow-md border-2 border-emerald-500/40 flex items-center justify-center shrink-0 ${editable ? 'cursor-pointer hover:ring-2 hover:ring-emerald-400 transition-all' : ''}`}
-        title={editable ? "লোগো পরিবর্তন করতে ক্লিক করুন" : "ইসলামী বিশ্ববিদ্যালয় লোগো"}
+        title={editable ? "ছবি পরিবর্তন বা আপলোড করতে ক্লিক করুন (PDF এ এটি যুক্ত হবে)" : "ইসলামী বিশ্ববিদ্যালয় লোগো"}
       >
         {customLogo && !imgError ? (
           <img 
             src={customLogo} 
-            alt="Logo" 
+            alt="Batch Logo" 
             onError={() => setImgError(true)} 
             className="w-full h-full object-contain drop-shadow-sm rounded-full" 
           />
@@ -83,7 +83,7 @@ export function Logo({
         {editable && (
           <div className="absolute inset-0 bg-slate-950/70 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity rounded-full">
             <Camera className="w-4 h-4 text-emerald-300" />
-            <span className="text-[8px] font-bold text-center leading-none mt-0.5">আপলোড</span>
+            <span className="text-[8px] font-bold text-center leading-none mt-0.5">ছবি দিন</span>
           </div>
         )}
       </div>
