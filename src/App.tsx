@@ -41,17 +41,17 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('all');
 
   const [batchInfo, setBatchInfo] = useState<BatchInfo>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.BATCH_INFO);
-    if (saved) {
-      try {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.BATCH_INFO);
+      if (saved) {
         const parsed = JSON.parse(saved);
         if (!parsed.customLogo) {
           parsed.customLogo = getDefaultEmblemDataUrl();
         }
         return parsed;
-      } catch {
-        // fallback
       }
+    } catch (e) {
+      console.warn('Storage read warning (batchInfo):', e);
     }
     return {
       ...INITIAL_BATCH_INFO,
@@ -60,18 +60,48 @@ export default function App() {
   });
 
   const [students, setStudents] = useState<Student[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.STUDENTS);
-    return saved ? JSON.parse(saved) : INITIAL_STUDENTS;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.STUDENTS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('Storage read warning (students):', e);
+    }
+    return INITIAL_STUDENTS;
   });
 
   const [contributions, setContributions] = useState<Contribution[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.CONTRIBUTIONS);
-    return saved ? JSON.parse(saved) : INITIAL_CONTRIBUTIONS;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.CONTRIBUTIONS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('Storage read warning (contributions):', e);
+    }
+    return INITIAL_CONTRIBUTIONS;
   });
 
   const [expenses, setExpenses] = useState<Expense[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.EXPENSES);
-    return saved ? JSON.parse(saved) : INITIAL_EXPENSES;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.EXPENSES);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('Storage read warning (expenses):', e);
+    }
+    return INITIAL_EXPENSES;
   });
 
   const [prefillStudent, setPrefillStudent] = useState<Student | null>(null);
@@ -83,19 +113,35 @@ export default function App() {
   const quickEntryRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.BATCH_INFO, JSON.stringify(batchInfo));
+    try {
+      localStorage.setItem(STORAGE_KEYS.BATCH_INFO, JSON.stringify(batchInfo));
+    } catch (e) {
+      console.warn('Failed to save batchInfo to storage:', e);
+    }
   }, [batchInfo]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(students));
+    try {
+      localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(students));
+    } catch (e) {
+      console.warn('Failed to save students to storage:', e);
+    }
   }, [students]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.CONTRIBUTIONS, JSON.stringify(contributions));
+    try {
+      localStorage.setItem(STORAGE_KEYS.CONTRIBUTIONS, JSON.stringify(contributions));
+    } catch (e) {
+      console.warn('Failed to save contributions to storage:', e);
+    }
   }, [contributions]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.EXPENSES, JSON.stringify(expenses));
+    try {
+      localStorage.setItem(STORAGE_KEYS.EXPENSES, JSON.stringify(expenses));
+    } catch (e) {
+      console.warn('Failed to save expenses to storage:', e);
+    }
   }, [expenses]);
 
   const showToast = (msg: string) => {
